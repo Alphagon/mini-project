@@ -1,0 +1,7 @@
+numpy
+fastapi
+uvicorn
+pydantic
+tensorflow[and-cuda]
+joblib
+requests
