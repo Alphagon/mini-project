@@ -6,7 +6,6 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.datasets import imdb
 from tensorflow.keras.models import load_model
 
-
 #Parameters
 max_len = 100
 max_features = 10000
