@@ -8,7 +8,7 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.datasets import imdb
 from tensorflow.keras.models import load_model
 from pymongo import MongoClient
-from db.sql import Prediction
+from db.sql import Prediction, engine, Session
 import json
 
 #Parameters
@@ -67,11 +67,9 @@ async def predict_sentiment(review: Review, request: Request):
 
         # Model input and output
         try:
-            cursor.execute(
-                "INSERT INTO predictions (review_text, predicted_label, probability) VALUES (%s, %s, %s)"
-                (review.text, sentiment, probability)
-            )
-            conn.commit
+            record = Prediction(review_text=review.text, predicted_label=sentiment, probability=round(float(probability), 2))
+            with Session(engine) as session:
+                session.add(record)            
         except Exception as db_Exception:
             log_entry["status"] = "Database Error"
             log_entry["error_detail"] = str(db_Exception)
