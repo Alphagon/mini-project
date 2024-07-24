@@ -1,14 +1,6 @@
 version: '3.8'
 
 services:
-  api:
-    build: .
-    ports:
-      - "8000:8000"
-    depends_on:
-      - mongodb
-      - postgres
-  
   mongodb:
     image: mongo:latest
     container_name: mongo
@@ -16,19 +8,29 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+      - ./init/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
   postgres:
     image: postgres:latest
     container_name: postgres
     environment:
-      POSTGRES_USER: Ineed to create it
-      POSTFRES_PASSWORD: need to create it
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: sentiment_db
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init/postgres-init.sql:/docker-entrypoint-initdb.d/postgres-init.sql:ro
 
-volumnes:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+      - postgres
+
+volumes:
   mongo_data:
   postgres_data:

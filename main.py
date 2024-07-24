@@ -8,7 +8,7 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.datasets import imdb
 from tensorflow.keras.models import load_model
 from pymongo import MongoClient
-import psycopg2
+from db.sql import Prediction
 import json
 
 #Parameters
@@ -31,20 +31,11 @@ app = FastAPI(title="IMDB Sentiment classifier API",
 class Review(BaseModel):
     text: str
 
-# MongoDB setup
-client = MongoClient('mongodb://mongo:27017/')
-db = client.sentiment_analysis
-logs_collection = db.api_logs
+# # MongoDB setup
+# client = MongoClient('mongodb://mongo:27017/')
+# db = client.sentiment_analysis
+# logs_collection = db.api_logs
 
-
-# PostgreSQL setup
-conn = psycopg2.connect(
-    dbname="sentiment_db",
-    user="need to update",
-    password="same",
-    host="postgres"
-)
-cursor = conn.cursor()
 
 @app.post("/predict")
 async def predict_sentiment(review: Review, request: Request):
@@ -97,7 +88,8 @@ async def predict_sentiment(review: Review, request: Request):
         raise HTTPException(status_code=500, detail="An unexpected error occured")
     
     finally:
-        logs_collection.insert_one(log_entry)
+        # logs_collection.insert_one(log_entry)
+        pass
 
 if __name__ == "__main__":
     import uvicorn

@@ -1,8 +1,7 @@
 fastapi
 uvicorn
 pydantic
-tensorflow[and-cuda]
 joblib
 requests
 pymongo
-psycopg2-binary
+sqlmodel
