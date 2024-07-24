@@ -1,5 +1,3 @@
-# This is a branch push - test
-
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
@@ -8,7 +6,7 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.datasets import imdb
 from tensorflow.keras.models import load_model
 from pymongo import MongoClient
-from db.sql import Prediction
+from db.sql import Prediction, engine, Session
 import json
 
 #Parameters
@@ -39,24 +37,13 @@ class Review(BaseModel):
 
 @app.post("/predict")
 async def predict_sentiment(review: Review, request: Request):
-    # Logging 
-    log_entry = {
-        "client": request.client.host,
-        "review": review.text,
-        "path": request.url.path,
-        "method": request.method,
-        "headers": dict(request.headers),
-        "status": "received"
-    }
-
     try:
         preprocessed_review = preprocess_review(review.text, word_to_index, max_len, max_features)
 
         try:
             prediction = model.predict(preprocessed_review)
         except Exception as model_Exception:
-            log_entry["status"] = "Prediction error"
-            log_entry["error_detail"] = str(model_Exception)
+            print(model_Exception)
             raise HTTPException(status_code=500, detail="Prediction error")
 
         probability = prediction[0][0]
@@ -66,25 +53,15 @@ async def predict_sentiment(review: Review, request: Request):
         result = {"Sentiment": sentiment, "Probability": float(probability)}
 
         # Model input and output
-        try:
-            cursor.execute(
-                "INSERT INTO predictions (review_text, predicted_label, probability) VALUES (%s, %s, %s)"
-                (review.text, sentiment, probability)
-            )
-            conn.commit
-        except Exception as db_Exception:
-            log_entry["status"] = "Database Error"
-            log_entry["error_detail"] = str(db_Exception)
-            raise HTTPException(status_code=500, detail="Database error")
-        
-        log_entry["status"] = "success"
-        logs_collection.insert_one(logs_collection)
-
+        record = Prediction(review_text=review.text, predicted_label=sentiment, probability=round(float(probability), 2))
+        with Session(engine) as session:
+            session.add(record)
+            session.commit()
+            print("executed")            
         return result
     
     except Exception as general_Exception:
-        log_entry["status"] = "General Error"
-        log_entry["error_details"] = str(general_Exception)
+        print(general_Exception)
         raise HTTPException(status_code=500, detail="An unexpected error occured")
     
     finally:
