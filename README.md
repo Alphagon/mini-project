@@ -2,9 +2,9 @@
 
 ##### Overview -
 This project involves building a RESTful API service using FastAPI to serve a IMDB sentiment classifier model. The service receives text input, processes it through the model, and returns the predicted sentiment and the probability. The project covers the following aspects:
-FastAPI Framework: Utilises FastAPI to create an API.
-ML Model: Uses a pre-trained sentiment analysis model.
-Deployment: Containerised the application using Docker and deploys it on Google Cloud Platform
+- FastAPI Framework: Utilises FastAPI to create an API.
+- ML Model: Uses a pre-trained sentiment analysis model.
+- Deployment: Containerised the application using Docker and deploys it on Google Cloud Platform
 
 ##### Prerequisites - 
 ###### Language -
@@ -15,6 +15,7 @@ Deployment: Containerised the application using Docker and deploys it on Google 
 - pydantic
 - tensorflow - If running on CPU
 - tensorflow[and-cuda] - If GPU is enabled
+
 All the libraries will be present in the requirements.txt file in the project folder.
 
 ##### Setting Up the Environment -
@@ -64,7 +65,7 @@ First check if docker is installed or not with “sudo docker ps” Command.
 If it is not installed use the following command to install it
 `sudo apt-get install -y docker.io`
 
-Next start the docker
+Next run the following docker commands
 - `sudo systemctl start docker` # Start the docker
 
 - `sudo usermod -aG docker $USER` # Adding our user to the group
@@ -105,9 +106,9 @@ Once this is done we can move on to the deployment of docker in GCP
 
 4. Once the files are copied, follow the same steps mentioned in “Building the Docker Image”
 
-5. Once the docker is built and running, we need to port forward port 8000. 
+5. Once the docker is built and running, we need to port forward port 8000.
 In the networking interface tab of the created Virtual Machine add a new firewall rule to port forward.
-
+![alt text](image.png)
 Now using the VM’s external IP address we can access the API
 `http://<external-ip>:8000/docs`
 
