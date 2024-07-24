@@ -11,32 +11,32 @@ Deployment: Containerised the application using Docker and deploys it on Google 
 Prerequisites - 
 Language - Python 3.9.13
 Packages -
-fastapi
-Uvicorn
-pydantic
-tensorflow - If running on CPU
-tensorflow[and-cuda] - If GPU is enabled
+- fastapi
+- Uvicorn
+- pydantic
+- tensorflow - If running on CPU
+- tensorflow[and-cuda] - If GPU is enabled
 All the libraries will be present in the requirements.txt file in the project folder.
 
 Setting Up the Environment -
 Create a virtual environment
-Python3 -m venv onelab
+- Python3 -m venv onelab
 
-Source onelab/bin/activate #To use the environment
+- Source onelab/bin/activate #To use the environment
 
 Install required Packages
-pip install -r requirements.txt
+-pip install -r requirements.txt
 
 To Deactivate the Environment
-deactivate
+- deactivate
 
 Project Structure
 The project directory contains the following files:
 mini-project/
-	- Dockerfile
-	- main.py
-	- requirements.txt
-	- sentiment-model.h5
+- Dockerfile
+- main.py
+- requirements.txt
+- sentiment-model.h5
 
 
 FastAPI Application
