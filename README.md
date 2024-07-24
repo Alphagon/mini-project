@@ -7,7 +7,7 @@ ML Model: Uses a pre-trained sentiment analysis model.
 Deployment: Containerised the application using Docker and deploys it on Google Cloud Platform
 
 ##### Prerequisites - 
-###### Language 
+###### Language -
 - Python 3.9.13
 ###### Packages -
 - fastapi
@@ -18,24 +18,23 @@ Deployment: Containerised the application using Docker and deploys it on Google 
 All the libraries will be present in the requirements.txt file in the project folder.
 
 ##### Setting Up the Environment -
-###### Create a virtual environment
-- Python3 -m venv onelab
-- Source onelab/bin/activate #To use the environment
+Create a virtual environment
+- 'Python3 -m venv onelab'
+- 'Source onelab/bin/activate #To use the environment'
 
-###### Install required Packages
-- pip install -r requirements.txt
+Install required Packages
+- 'pip install -r requirements.txt'
 
 ###### To Deactivate the Environment
-- deactivate
+- 'deactivate'
 
 ##### Project Structure
-###### The project directory contains the following files:
+The project directory contains the following files:
 mini-project/
 - Dockerfile
 - main.py
 - requirements.txt
 - sentiment-model.h5
-
 
 ##### FastAPI Application
 The FastAPI application (‘main.py’) serves the IMDB sentiment classifier model.
