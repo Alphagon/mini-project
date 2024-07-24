@@ -1,16 +1,15 @@
-FastAPI for ML APIs
+### FastAPI service for IMDB sentiment classifier.
 
-FastAPI service for IMDB sentiment classifier.
-
-Overview -
+##### Overview -
 This project involves building a RESTful API service using FastAPI to serve a IMDB sentiment classifier model. The service receives text input, processes it through the model, and returns the predicted sentiment and the probability. The project covers the following aspects:
 FastAPI Framework: Utilises FastAPI to create an API.
 ML Model: Uses a pre-trained sentiment analysis model.
 Deployment: Containerised the application using Docker and deploys it on Google Cloud Platform
 
-Prerequisites - 
-Language - Python 3.9.13
-Packages -
+##### Prerequisites - 
+###### Language 
+- Python 3.9.13
+###### Packages -
 - fastapi
 - Uvicorn
 - pydantic
@@ -18,20 +17,19 @@ Packages -
 - tensorflow[and-cuda] - If GPU is enabled
 All the libraries will be present in the requirements.txt file in the project folder.
 
-Setting Up the Environment -
-Create a virtual environment
+##### Setting Up the Environment -
+###### Create a virtual environment
 - Python3 -m venv onelab
-
 - Source onelab/bin/activate #To use the environment
 
-Install required Packages
--pip install -r requirements.txt
+###### Install required Packages
+- pip install -r requirements.txt
 
-To Deactivate the Environment
+###### To Deactivate the Environment
 - deactivate
 
-Project Structure
-The project directory contains the following files:
+##### Project Structure
+###### The project directory contains the following files:
 mini-project/
 - Dockerfile
 - main.py
@@ -39,13 +37,12 @@ mini-project/
 - sentiment-model.h5
 
 
-FastAPI Application
+##### FastAPI Application
 The FastAPI application (‘main.py’) serves the IMDB sentiment classifier model.
 
-
-Dockerization:
+##### Dockerization:
 Create a file called Dockerfile and include the following commands
-
+$$
 FROM python:3.9.13
 
 WORKDIR /app
@@ -58,7 +55,7 @@ COPY . /app
 EXPOSE 8000
 
 CMD [“uvicorn”, “main:app”, “--host”, “0.0.0.0”, “--port”, “8000”]
-
+$$
 
 Building the Docker Image:
 First check if docker is installed or not with “sudo docker ps” Command
