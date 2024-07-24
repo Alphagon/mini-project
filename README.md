@@ -30,11 +30,12 @@ To Deactivate the Environment
 
 ##### Project Structure
 The project directory contains the following files:
-|-mini-project/
-| |-Dockerfile
-| |-main.py
-| |-requirements.txt
-| |-sentiment-model.h5
+├──mini-project/
+|   ├──Dockerfile
+|   ├──main.py
+|   ├──requirements.txt
+|   ├──sentiment-model.h5
+
 
 ##### FastAPI Application
 The FastAPI application (‘main.py’) serves the IMDB sentiment classifier model.
