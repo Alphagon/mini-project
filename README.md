@@ -19,14 +19,14 @@ All the libraries will be present in the requirements.txt file in the project fo
 
 ##### Setting Up the Environment -
 Create a virtual environment
-- 'Python3 -m venv onelab'
-- 'Source onelab/bin/activate #To use the environment'
+- `Python3 -m venv onelab`
+- `Source onelab/bin/activate #To use the environment`
 
 Install required Packages
-- 'pip install -r requirements.txt'
+- `pip install -r requirements.txt`
 
 ###### To Deactivate the Environment
-- 'deactivate'
+- `deactivate`
 
 ##### Project Structure
 The project directory contains the following files:
@@ -41,7 +41,8 @@ The FastAPI application (‘main.py’) serves the IMDB sentiment classifier mod
 
 ##### Dockerization:
 Create a file called Dockerfile and include the following commands
-$$
+
+``
 FROM python:3.9.13
 
 WORKDIR /app
@@ -54,7 +55,7 @@ COPY . /app
 EXPOSE 8000
 
 CMD [“uvicorn”, “main:app”, “--host”, “0.0.0.0”, “--port”, “8000”]
-$$
+``
 
 Building the Docker Image:
 First check if docker is installed or not with “sudo docker ps” Command
