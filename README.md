@@ -77,6 +77,7 @@ Next start the docker
 - sudo docker run -d -p 8000:8000 fastapi-sentiment  # run the docker with the following command
 
 
+
 Testing the API
 Test the API locally using the Fast API documentation
 http://localhost:8000/docs
