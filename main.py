@@ -41,8 +41,8 @@ logs_collection = db.api_logs
 # PostgreSQL setup
 conn = psycopg2.connect(
     dbname="sentiment_db",
-    user="need to update"
-    password="same"
+    user="need to update",
+    password="same",
     host="postgres"
 )
 cursor = conn.cursor()
@@ -55,7 +55,7 @@ async def predict_sentiment(review: Review, request: Request):
         "review": review.text,
         "path": request.url.path,
         "method": request.method,
-        "headers": dict(request.headers)
+        "headers": dict(request.headers),
         "status": "received"
     }
 
