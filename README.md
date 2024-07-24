@@ -30,12 +30,13 @@ To Deactivate the Environment
 
 ##### Project Structure
 The project directory contains the following files:
+```
 ├──mini-project/
 |   ├──Dockerfile
 |   ├──main.py
 |   ├──requirements.txt
 |   ├──sentiment-model.h5
-
+```
 
 ##### FastAPI Application
 The FastAPI application (‘main.py’) serves the IMDB sentiment classifier model.
@@ -43,7 +44,7 @@ The FastAPI application (‘main.py’) serves the IMDB sentiment classifier mod
 ##### Dockerization:
 Create a file called Dockerfile and include the following commands
 
-``
+```
 FROM python:3.9.13
 
 WORKDIR /app
@@ -56,40 +57,42 @@ COPY . /app
 EXPOSE 8000
 
 CMD [“uvicorn”, “main:app”, “--host”, “0.0.0.0”, “--port”, “8000”]
-``
+```
 
-Building the Docker Image:
-First check if docker is installed or not with “sudo docker ps” Command
+##### Building the Docker Image:
+First check if docker is installed or not with “sudo docker ps” Command.
 If it is not installed use the following command to install it
-“sudo apt-get install -y docker.io”
+`sudo apt-get install -y docker.io`
 
 Next start the docker
-- sudo systemctl start docker # Start the docker
+- `sudo systemctl start docker` # Start the docker
 
-- sudo usermod -aG docker $USER # Adding our user to the group
+- `sudo usermod -aG docker $USER` # Adding our user to the group
 
-- newgrp docker # Logout and login to the system or use this command reset the user group
+- `newgrp docker` # Logout and login to the system or use this command reset the user group
 
-- sudo docker build -t fastapi-sentiment .  # build the docker with the name “fastapi-sentiment”
+- `sudo docker build -t fastapi-sentiment .`  # build the docker with the name “fastapi-sentiment”
 
-- sudo docker run -d -p 8000:8000 fastapi-sentiment  # run the docker with the following command
+- `sudo docker run -d -p 8000:8000 fastapi-sentiment`  # run the docker with the following command
 
 
-
-Testing the API
+##### Testing the API
 Test the API locally using the Fast API documentation
-http://localhost:8000/docs
+`http://localhost:8000/docs`
 
-Or using ‘curl’ - Request Format
+Request Format
+Using ‘curl’
+```
 curl -X 'POST' \
   'http://localhost:8000/predict' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
-  "text": "The first episode is interesting and you get the feeling that this might be quite good! People get stuck in a village for mysterious reasons and get slaughtered by creepy monsters."}'
-
+  "text": "The first episode is interesting and you get the feeling that this might be quite good! People get stuck in a village for mysterious reasons and get slaughtered by creepy monsters."
+  }'
+```
 Response Format
-{"Sentiment":"positive", "Probability":0.99}
+`{"Sentiment":"positive", "Probability":0.99}`
 
 
 Once this is done we can move on to the deployment of docker in GCP 
@@ -98,7 +101,7 @@ Once this is done we can move on to the deployment of docker in GCP
 2. After the machine is spun up, add the local machine machine SSH key “id_ed25519.pub” to a file called ".ssh/authorized_keys" in the VM.
 
 3. Transfer the project files to VM
-scp -r mini-project username@externalIP:~/.
+`scp -r mini-project username@externalIP:~/.`
 
 4. Once the files are copied, follow the same steps mentioned in “Building the Docker Image”
 
@@ -106,13 +109,16 @@ scp -r mini-project username@externalIP:~/.
 In the networking interface tab of the created Virtual Machine add a new firewall rule to port forward.
 
 Now using the VM’s external IP address we can access the API
-http://<external-ip>:8000/docs 
+`http://<external-ip>:8000/docs`
 
 Or 
 
+```
 curl -X 'POST' \
   'http://<external-ip>:8000/predict' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
-  "text": "The first episode is interesting and you get the feeling that this might be quite good! People get stuck in a village for mysterious reasons and get slaughtered by creepy monsters."}'
+  "text": "The first episode is interesting and you get the feeling that this might be quite good! People get stuck in a village for mysterious reasons and get slaughtered by creepy monsters."
+  }'
+  ```
