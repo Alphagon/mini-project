@@ -25,16 +25,16 @@ Create a virtual environment
 Install required Packages
 - `pip install -r requirements.txt`
 
-###### To Deactivate the Environment
+To Deactivate the Environment
 - `deactivate`
 
 ##### Project Structure
 The project directory contains the following files:
-mini-project/
-- Dockerfile
-- main.py
-- requirements.txt
-- sentiment-model.h5
+|-mini-project/
+| |-Dockerfile
+| |-main.py
+| |-requirements.txt
+| |-sentiment-model.h5
 
 ##### FastAPI Application
 The FastAPI application (‘main.py’) serves the IMDB sentiment classifier model.
