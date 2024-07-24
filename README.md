@@ -109,6 +109,8 @@ Once this is done we can move on to the deployment of docker in GCP
 5. Once the docker is built and running, we need to port forward port 8000.
 In the networking interface tab of the created Virtual Machine add a new firewall rule to port forward.
 ![alt text](image.png)
+
+
 Now using the VM’s external IP address we can access the API
 `http://<external-ip>:8000/docs`
 
