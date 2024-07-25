@@ -9,7 +9,7 @@ max_len = 100
 max_features = 10000
 
 word_to_index = imdb.get_word_index()
-model = load_model("model/sentiment-model.h5")
+model = load_model("src/model/sentiment-model.h5")
 
 def preprocess_review(review, word_to_index, max_len, max_features):
     tokenizer = Tokenizer(num_words=max_features)

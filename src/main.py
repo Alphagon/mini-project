@@ -1,8 +1,8 @@
 from fastapi import FastAPI, HTTPException, Request
-from models import Review
-from services import make_predictions
-from db.mongo import log_to_mongo, create_log_entry
-from db.sql import push_to_postgres
+from .models import Review
+from .services import make_predictions
+from .db.mongo import log_to_mongo, create_log_entry
+from .db.sql import push_to_postgres
 
 
 app = FastAPI(title="IMDB Sentiment classifier API",

@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 
 #MongoDB setup
-client = MongoClient('mongodb://localhost:27107')
+client = MongoClient('mongodb://mongo:27107')
 database_name = "sentiment_logs"
 collection_name = "api_logs"
 
@@ -19,7 +19,7 @@ def get_database_and_collection(client, db_name, collection_name):
         
     return db[collection_name]
 
-logs_collection = get_database_and_collection(client, db_name, collection_name)
+logs_collection = get_database_and_collection(client, database_name, collection_name)
 
 def log_to_mongo(log_entry):
     try:
