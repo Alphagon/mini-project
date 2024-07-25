@@ -1,6 +1,9 @@
 from sqlmodel import SQLModel, Field, create_engine, Session, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from typing import Optional
+from sqlalchemy import Column, DateTime
+from datetime import datetime
+
 DATABASE_URL = "postgresql://postgres:postgres@postgres:5432/sentiment_db"
 engine = create_engine(DATABASE_URL, echo=True, future=True)
 
@@ -9,6 +12,13 @@ class Prediction(SQLModel, table=True):
     review_text: str
     predicted_label: str
     probability: float
+    timestamp: datetime = Field(sa_column=Column(DateTime, default=datetime.utcnow))
 
 # Create tables
 SQLModel.metadata.create_all(engine)
+
+def push_to_postgres(review, sentiment, probability):
+    record = Prediction(review_text=review, predicted_label=sentiment, probability=round(float(probability), 2))
+    with Session(engine) as session:
+        session.add(record)
+        session.commit()

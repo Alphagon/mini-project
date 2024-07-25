@@ -30,6 +30,9 @@ services:
     depends_on:
       - mongodb
       - postgres
+    # environment:
+    #   - MONGO_URI: "mongodb://mongo:27107"
+    #   - POSTGRES_URI: ""
 
 volumes:
   mongo_data:
