@@ -16,3 +16,9 @@ class Prediction(SQLModel, table=True):
 
 # Create tables
 SQLModel.metadata.create_all(engine)
+
+def push_to_postgres(review, sentiment, probability):
+    record = Prediction(review_text=review, predicted_label=sentiment, probability=round(float(probability), 2))
+    with Session(engine) as session:
+        session.add(record)
+        session.commit()

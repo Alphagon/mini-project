@@ -8,7 +8,7 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
-      - ./init/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      # - ./init/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
   postgres:
     image: postgres:latest
@@ -21,7 +21,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init/postgres-init.sql:/docker-entrypoint-initdb.d/postgres-init.sql:ro
+      # - ./init/postgres-init.sql:/docker-entrypoint-initdb.d/postgres-init.sql:ro
 
   api:
     build: .

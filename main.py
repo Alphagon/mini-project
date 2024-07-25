@@ -6,7 +6,7 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.datasets import imdb
 from tensorflow.keras.models import load_model
 from pymongo import MongoClient
-from db.sql import Prediction, engine, Session
+from db.sql import push_to_postgres
 import json
 
 #Parameters
@@ -29,10 +29,10 @@ app = FastAPI(title="IMDB Sentiment classifier API",
 class Review(BaseModel):
     text: str
 
-# # MongoDB setup
-# client = MongoClient('mongodb://mongo:27017/')
-# db = client.sentiment_analysis
-# logs_collection = db.api_logs
+# MongoDB setup
+client = MongoClient('mongodb://mongo:27017/')
+db = client.sentiment_analysis
+logs_collection = db.api_logs
 
 
 @app.post("/predict")
@@ -53,11 +53,7 @@ async def predict_sentiment(review: Review, request: Request):
         result = {"Sentiment": sentiment, "Probability": float(probability)}
 
         # Model input and output
-        record = Prediction(review_text=review.text, predicted_label=sentiment, probability=round(float(probability), 2))
-        with Session(engine) as session:
-            session.add(record)
-            session.commit()
-            print("executed")            
+        push_to_postgres(review.text, sentiment, probability)
         return result
     
     except Exception as general_Exception:
@@ -67,6 +63,7 @@ async def predict_sentiment(review: Review, request: Request):
     finally:
         # logs_collection.insert_one(log_entry)
         pass
+
 
 if __name__ == "__main__":
     import uvicorn
