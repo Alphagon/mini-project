@@ -1,7 +1,9 @@
 from pymongo import MongoClient
+import os
 
 #MongoDB setup
-client = MongoClient('mongodb://mongo:27107')
+mongo_uri = os.getenv('MONGO_URL', 'mongodb://mongo:27017')
+client = MongoClient(mongo_uri)
 database_name = "sentiment_logs"
 collection_name = "api_logs"
 

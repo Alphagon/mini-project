@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request
 from .models import Review
 from .services import make_predictions
-from .db.mongo import log_to_mongo, create_log_entry
+from .db.mongo import log_to_mongo, create_log_entry, logs_collection
 from .db.sql import push_to_postgres
 
 

@@ -19,7 +19,7 @@ def preprocess_review(review, word_to_index, max_len, max_features):
     return padded_sequence
 
 def make_predictions(review):
-    preprocessed_review = preprocess_review(review.text, word_to_index, max_len, max_features)
+    preprocessed_review = preprocess_review(review, word_to_index, max_len, max_features)
     prediction = model.predict(preprocessed_review)
     probability = prediction[0][0]
     predicted_label = (prediction > 0.5).astype("int32")
