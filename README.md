@@ -89,6 +89,8 @@ Create two new files named sql.py and mongo.py inside the db folder. Implement t
 Integrate the functions created in sql.py and mongo.py into main.py. Ensure that your API logs requests to MongoDB and stores predictions in PostgreSQL.
 Database Access and Querying
 
+
+##### 8. Accessing Databases
 ###### PostgreSQL Access
 To check if PostgreSQL is storing data correctly, use the following command to access the PostgreSQL command line:
 
