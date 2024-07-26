@@ -1,12 +1,16 @@
 from fastapi import FastAPI, HTTPException, Request
 from .models import Review
 from .services import make_predictions
-from .db.mongo import log_to_mongo, create_log_entry, logs_collection
+from .db.mongo import log_to_mongo, create_log_entry, initalize_logs_collection, mongo_collection_name, mongo_db_name, mongo_uri
 from .db.sql import push_to_postgres
 
 
 app = FastAPI(title="IMDB Sentiment classifier API",
               version="0.2")
+
+@app.on_event("startup")
+async def startup_event():
+    await initalize_logs_collection()
 
 @app.post("/predict")
 async def predict_sentiment(review: Review, request: Request):

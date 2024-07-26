@@ -12,6 +12,7 @@ COPY requirements/api.txt /app/requirements/api.txt
 RUN pip install --no-cache-dir -r requirements/api.txt
 
 COPY src /app/src
+COPY .env /app/
 
 EXPOSE 8000
 

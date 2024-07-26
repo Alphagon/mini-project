@@ -1,10 +1,21 @@
-from sqlmodel import SQLModel, Field, create_engine, Session, select
-from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlmodel import SQLModel, Field, create_engine, Session
+# from sqlmodel.ext.asyncio.session import AsyncSession
 from typing import Optional
 from sqlalchemy import Column, DateTime
 from datetime import datetime
+from dotenv import load_dotenv
+import os
 
-DATABASE_URL = "postgresql://postgres:postgres@postgres:5432/sentiment_db"
+env_path = os.path.join(os.path.dirname(__file__), '../../.env')
+load_dotenv(env_path)
+
+psql_username = os.getenv('POSTGRES_USERNAME')
+psql_password = os.getenv('POSTGRES_PASSWORD')
+psql_host = os.getenv('POSTGRES_HOST')
+psql_port = os.getenv('POSTGRES_PORT')
+psql_database_name = os.getenv("POSTGRES_DATABASE_NAME")
+
+DATABASE_URL = f"postgresql://{psql_username}:{psql_password}@{psql_host}:{psql_port}/{psql_database_name}"
 engine = create_engine(DATABASE_URL, echo=True, future=True)
 
 class Prediction(SQLModel, table=True):

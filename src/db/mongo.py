@@ -1,17 +1,21 @@
 # from pymongo import MongoClient
 from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
+from datetime import datetime
 import os
 
 # Loading environment variables from .envfile
-load_dotenv()
+env_path = os.path.join(os.path.dirname(__file__), '../../.env')
+load_dotenv(env_path)
 
 #MongoDB setup
 mongo_uri = os.getenv('MONGO_URL')
 mongo_db_name = os.getenv('MONGO_DATABASE_NAME')
 mongo_collection_name = os.getenv("MONGO_COLLECTION_NAME")
 
+
 client = AsyncIOMotorClient(mongo_uri)
+
 
 async def get_database_and_collection(client, db_name, collection_name):
     db_list = await client.list_database_names()
@@ -28,11 +32,16 @@ async def get_database_and_collection(client, db_name, collection_name):
         
     return db[collection_name]
 
-logs_collection = get_database_and_collection(client, mongo_db_name, mongo_collection_name)
+logs_collection = None
+
+async def initalize_logs_collection():
+    global logs_collection
+    logs_collection = await get_database_and_collection(client, mongo_db_name, mongo_collection_name)
 
 async def log_to_mongo(log_entry):
     try:
         await logs_collection.insert_one(log_entry)
+        # print("Data Logged!")
     except Exception as mongoException:
         print(f"Error logging in Mongo: \n{mongoException}")
 
@@ -43,7 +52,8 @@ def create_log_entry(request, review_text, status, error_details=None):
         "path": request.url.path,
         "method": request.method,
         "headers": dict(request.headers),
-        "status": status
+        "status": status,
+        "timestamp": datetime.utcnow().isoformat()
     }
     if error_details:
         log_entry["error_details"] = error_details
