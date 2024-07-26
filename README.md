@@ -8,7 +8,7 @@ This documentation outlines the setup process for integrating MongoDB and Postgr
 First, create a `.env` file in the root directory of your project and include all sensitive information related to your databases. This file should never be pushed to GitHub or any public repository. Instead, it should be manually uploaded to the required virtual machine or added as secrets in your cloud environment.
 
 **Example `.env` file content:**
-```plaintext
+```
 MONGO_URL=mongodb://mongo:27017
 MONGO_INITDB_ROOT_USERNAME=your_mongo_root_username
 MONGO_INITDB_ROOT_PASSWORD=your_mongo_root_password
@@ -19,7 +19,7 @@ POSTGRES_PASSWORD=postgres
 POSTGRES_HOST=postgres
 POSTGRES_PORT=5432
 POSTGRES_DATABASE_NAME=sentiment_db
-
+```
 
 ##### 2. Dockerfile Update
 Ensure that your Dockerfile copies the .env file while building the application. This allows the application to access the required environment variables at runtime.
