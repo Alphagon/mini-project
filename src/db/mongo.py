@@ -1,31 +1,33 @@
-from pymongo import MongoClient
+# from pymongo import MongoClient
+from motor.motor_asyncio import AsyncIOMotorClient
 import os
 
 #MongoDB setup
 mongo_uri = os.getenv('MONGO_URL', 'mongodb://mongo:27017')
-client = MongoClient(mongo_uri)
+client = AsyncIOMotorClient(mongo_uri)
 database_name = "sentiment_logs"
 collection_name = "api_logs"
 
-def get_database_and_collection(client, db_name, collection_name):
-    db_list = client.list_database_names()
+async def get_database_and_collection(client, db_name, collection_name):
+    db_list = await client.list_database_names()
     if db_name not in db_list:
         db = client[db_name]
-        db.create_collection(collection_name)
+        await db.create_collection(collection_name)
         print(f"Database {db_name} and collection {collection_name} created")
     else:
         db = client[db_name]
-        if collection_name not in db.list_collection_names():
-            db.create_collection(collection_name)
-            print(f"Collection {collection_name} created in database {database}")
+        collection_list = await db.list_collection_names()
+        if collection_name not in collection_list:
+            await db.create_collection(collection_name)
+            print(f"Collection {collection_name} created in database {db_name}")
         
     return db[collection_name]
 
 logs_collection = get_database_and_collection(client, database_name, collection_name)
 
-def log_to_mongo(log_entry):
+async def log_to_mongo(log_entry):
     try:
-        logs_collection.insert_one(log_entry)
+        await logs_collection.insert_one(log_entry)
     except Exception as mongoException:
         print(f"Error logging in Mongo: \n{mongoException}")
 
