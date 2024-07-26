@@ -33,7 +33,7 @@ async def predict_sentiment(review: Review, request: Request):
         raise HTTPException(status_code=500, detail="An unexpected error occured")
     
     finally:
-        log_to_mongo(log_entry)
+        await log_to_mongo(log_entry)
 
 
 if __name__ == "__main__":

@@ -8,3 +8,4 @@ sqlmodel
 motor
 # asyncpg
 psycopg2-binary
+python-dotenv
