@@ -6,6 +6,9 @@ Give user permissions - "sudo chmod +x /usr/local/bin/docker-compose"
 
 Write docker-compose code to run postgreSQL and MongoDB
 
+include all the sensitive information in .env file [Secrets]. This in real world should not be pushed to github. 
+This should be manually uploaded to the required the virtual machine or uploaded as secrets in the required cloud.
+
 build the docker - "sudo docker-compose up --build"
 
 Integrate main.py with storing of model realted data. and request related logging in PostgreSQL and MongoDB respectively.
