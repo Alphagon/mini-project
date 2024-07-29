@@ -1,127 +1,146 @@
-### FastAPI service for IMDB sentiment classifier.
+# Docker and Kubernetes for ML
 
-##### Overview -
-This project involves building a RESTful API service using FastAPI to serve a IMDB sentiment classifier model. The service receives text input, processes it through the model, and returns the predicted sentiment and the probability. The project covers the following aspects:
-- FastAPI Framework: Utilises FastAPI to create an API.
-- ML Model: Uses a pre-trained sentiment analysis model.
-- Deployment: Containerised the application using Docker and deploys it on Google Cloud Platform
+## Overview
+This documentation outlines the setup process to containerize a FastAPI application one built here and
+deploy it on a Kubernetes cluster, making the service scalable and robust.
 
-##### Prerequisites - 
-###### Language -
-- Python 3.9.13
-###### Packages -
-- fastapi
-- Uvicorn
-- pydantic
-- tensorflow - If running on CPU
-- tensorflow[and-cuda] - If GPU is enabled
+## Setup Process
 
-All the libraries will be present in the requirements.txt file in the project folder.
+### 1. Pushing  the image to Docker Hub
+First create an account in docker hub. And install the docker client on your machine.
+- Login to docker - `docker login`
+- Tag the docker image which you want to push - `docker tag <image tag> <username>/<repository_name>:<tag>`
+- Pushing the image to Docker hub - `docker push <username>/<repository_name>:<tag>`
+- To remove the tagged image from local or cloud machine if not required - `docker rmi <username>/<repository_name>`
 
-##### Setting Up the Environment -
-Create a virtual environment
-- `Python3 -m venv onelab`
-- `Source onelab/bin/activate #To use the environment`
 
-Install required Packages
-- `pip install -r requirements.txt`
+My image is published to following location in Dockerhub 
+`alphagon/fastapi-sentiment:latest`
 
-To Deactivate the Environment
-- `deactivate`
+### Creating service.yaml and configuration.yaml
+Login to Google Cloud Services and open the cloud terminal 
 
-##### Project Structure
-The project directory contains the following files:
-```
-├──mini-project/
-|   ├──Dockerfile
-|   ├──main.py
-|   ├──requirements.txt
-|   ├──sentiment-model.h5
-```
+Ensure you are using the correct GCP project and zone:
+- My project name is `theta-function-i8` - `gcloud config set project theta-function-i8`
+- My Zone is `asia-south1-a` - `gcloud config set compute/zone asia-south1-a`
 
-##### FastAPI Application
-The FastAPI application (‘main.py’) serves the IMDB sentiment classifier model.
+Create a Google Kubernetes cluster - `gcloud container clusters create fastapi-sentiment --zone asia-south1-a --num-nodes=3`
 
-##### Dockerization:
-Create a file called Dockerfile and include the following commands
+This command will take time to create the cluster . You can check the status of the cluster using the following command - 
+`gcloud container clusters describe fastapi-sentiment --zone asia-south1-a`. 
+Look for the status field in the output. It can show different states such as `PROVISIONING`, `RUNNING`, `REPAIRING`, or `DELETING`.
+Wait till the status is converted from `PROVISIONING` to `RUNNING`
+
+Next Get Cluster Credentials for kubectl to access - `gcloud container clusters get-credentials fastapi-sentiment --zone asia-south1-a`
+
+
+Create yaml file for configutaion and services
 
 ```
-FROM python:3.9.13
-
-WORKDIR /app
-
-COPY requirements.txt /app/requirements.txt
-RUN pip install -no-cache-dir -r requirements.txt
-
-COPY . /app
-
-EXPOSE 8000
-
-CMD [“uvicorn”, “main:app”, “--host”, “0.0.0.0”, “--port”, “8000”]
+cat <<EOF > configuration.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-sentiment
+  namespace: default
+  labels:
+    app: fastapi-sentiment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: fastapi-sentiment
+  template:
+    metadata:
+      labels:
+        app: fastapi-sentiment
+    spec:
+      containers:
+      - name: fastapi-sentiment
+        image: alphagon/fastapi-sentiment:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: fastapi-sentiment-hpa
+  namespace: default
+  labels:
+    app: fastapi-sentiment
+spec:
+  scaleTargetRef:
+    kind: Deployment
+    name: fastapi-sentiment
+    apiVersion: apps/v1
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+EOF
 ```
 
-##### Building the Docker Image:
-First check if docker is installed or not with “sudo docker ps” Command.
-If it is not installed use the following command to install it
-`sudo apt-get install -y docker.io`
+```
+cat <<EOF > service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi-sentiment-service
+  namespace: default
+  labels:
+    app: fastapi-sentiment
+  annotations:
+    cloud.google.com/neg: '{"ingress":true}'
+  finalizers:
+  - service.kubernetes.io/load-balancer-cleanup
+spec:
+  type: LoadBalancer
+  selector:
+    app: fastapi-sentiment
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+    nodePort: 30428
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  allocateLoadBalancerNodePorts: true
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  sessionAffinity: None
+EOF
+```
 
-Next run the following docker commands
-- `sudo systemctl start docker` # Start the docker
+Apply configuration and service yaml files
+- `kubectl apply -f configuration.yaml`
+- `kubectl apply -f service.yaml`
 
-- `sudo usermod -aG docker $USER` # Adding our user to the group
+Verify deployment
+- `kubectl get pods`
+- `kubectl get svc`
 
-- `newgrp docker` # Logout and login to the system or use this command reset the user group
+Access the the app using the external IP generated from the above command 
+`<external-IP>:8000/docks`
 
-- `sudo docker build -t fastapi-sentiment .`  # build the docker with the name “fastapi-sentiment”
+or using curl command
 
-- `sudo docker run -d -p 8000:8000 fastapi-sentiment`  # run the docker with the following command
-
-
-##### Testing the API
-Test the API locally using the Fast API documentation
-`http://localhost:8000/docs`
-
-Request Format
-Using ‘curl’
 ```
 curl -X 'POST' \
-  'http://localhost:8000/predict' \
+  '<external-IP>:8000/predict' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
   "text": "The first episode is interesting and you get the feeling that this might be quite good! People get stuck in a village for mysterious reasons and get slaughtered by creepy monsters."
   }'
 ```
-Response Format
-`{"Sentiment":"positive", "Probability":0.99}`
 
+Delete the cluster once it is not required - `gcloud container clusters delete fastapi-sentiment --zone asia-south1-a`
 
-Once this is done we can move on to the deployment of docker in GCP 
-1. Create a GCP VM Instance:
-
-2. After the machine is spun up, add the local machine machine SSH key “id_ed25519.pub” to a file called ".ssh/authorized_keys" in the VM.
-
-3. Transfer the project files to VM
-`scp -r mini-project username@externalIP:~/.`
-
-4. Once the files are copied, follow the same steps mentioned in “Building the Docker Image”
-
-5. Once the docker is built and running, we need to port forward port 8000.
-In the networking interface tab of the created Virtual Machine add a new firewall rule to port forward.
-![alt text](image.png)
-
-
-Now using the VM’s external IP address we can access the API
-`http://<external-ip>:8000/docs`
-
-Or 
-
-```
-curl -X 'POST' \
-  'http://<external-ip>:8000/predict' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "text": "The first episode is interesting and you get the feeling that this might be quite good! People get stuck in a village for mysterious reasons and get slaughtered by creepy monsters."
-  }'
-  ```
+Once deleted check again if there are any cluster running - `gcloud container clusters list`
