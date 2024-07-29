@@ -17,7 +17,7 @@ First create an account in docker hub. And install the docker client on your mac
 My image is published to following location in Dockerhub 
 `alphagon/fastapi-sentiment:latest`
 
-### Creating service.yaml and configuration.yaml
+### 2. Creating service.yaml and configuration.yaml
 Login to Google Cloud Services and open the cloud terminal 
 
 Ensure you are using the correct GCP project and zone:
@@ -117,7 +117,7 @@ spec:
   sessionAffinity: None
 EOF
 ```
-
+### 3. Applying the configuraion and Service, and accessing the app from external IP
 Apply configuration and service yaml files
 - `kubectl apply -f configuration.yaml`
 - `kubectl apply -f service.yaml`
@@ -141,6 +141,7 @@ curl -X 'POST' \
   }'
 ```
 
+### 4. Deleting the cluster
 Delete the cluster once it is not required - `gcloud container clusters delete fastapi-sentiment --zone asia-south1-a`
 
 Once deleted check again if there are any cluster running - `gcloud container clusters list`
