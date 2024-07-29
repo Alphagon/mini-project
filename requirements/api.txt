@@ -1,6 +1,5 @@
 fastapi
 uvicorn
 pydantic
-tensorflow[and-cuda]
 joblib
 requests
