@@ -20,18 +20,18 @@ My image is published to following location in Dockerhub
 ### 2. Creating service.yaml and configuration.yaml
 Login to Google Cloud Services and open the cloud terminal 
 
-Ensure you are using the correct GCP project and zone:
+Ensure you are using the correct GCP project and zone by running the following commands in the terminal:
 - My project name is `theta-function-i8` - `gcloud config set project theta-function-i8`
 - My Zone is `asia-south1-a` - `gcloud config set compute/zone asia-south1-a`
 
 Create a Google Kubernetes cluster - `gcloud container clusters create fastapi-sentiment --zone asia-south1-a --num-nodes=3`
 
-This command will take time to create the cluster . You can check the status of the cluster using the following command - 
+This command will take time to create the cluster. You can check the status of the cluster using the following command - 
 `gcloud container clusters describe fastapi-sentiment --zone asia-south1-a`. 
 Look for the status field in the output. It can show different states such as `PROVISIONING`, `RUNNING`, `REPAIRING`, or `DELETING`.
-Wait till the status is converted from `PROVISIONING` to `RUNNING`
+Wait till the status is converted from `PROVISIONING` to `RUNNING`.
 
-Next Get Cluster Credentials for kubectl to access - `gcloud container clusters get-credentials fastapi-sentiment --zone asia-south1-a`
+Next get cluster credentials for kubectl to access - `gcloud container clusters get-credentials fastapi-sentiment --zone asia-south1-a`
 
 
 Create yaml file for configutaion and services
@@ -118,7 +118,7 @@ spec:
 EOF
 ```
 ### 3. Applying the configuraion and Service, and accessing the app from external IP
-Apply configuration and service yaml files
+Apply configuration and service yaml files using kubectl
 - `kubectl apply -f configuration.yaml`
 - `kubectl apply -f service.yaml`
 
