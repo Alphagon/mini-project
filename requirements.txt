@@ -1,6 +1,7 @@
 fastapi
 uvicorn
 pydantic
-tensorflow[and-cuda]
+tensorflow
 joblib
 requests
+s3fs
