@@ -143,6 +143,7 @@ and execute the main.py code with the following command
 Test the API using the following address `http://0.0.0.0:8000/docs`
 
 or request using CURL
+```
 curl -X 'POST' \
   'http://localhost:8000/predict' \
   -H 'accept: application/json' \
@@ -150,3 +151,4 @@ curl -X 'POST' \
   -d '{
   "text": "Camera - You are awarded a SiPix Digital Camera! call 09061221066 fromm landline. Delivery within 28 days."
   }'
+```
