@@ -20,8 +20,8 @@ All the libraries will be present in the requirements.txt file in the project fo
 
 ##### Setting Up the Environment -
 Create a virtual environment
-- `Python3 -m venv onelab`
-- `Source onelab/bin/activate #To use the environment`
+- `Python3 -m venv yolo`
+- `Source yolo/bin/activate #To use the environment`
 
 Install required Packages
 - `pip install -r requirements.txt`
