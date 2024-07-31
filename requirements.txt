@@ -1,7 +1,0 @@
-fastapi
-uvicorn
-pydantic
-tensorflow
-joblib
-requests
-s3fs

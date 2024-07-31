@@ -1,127 +1,152 @@
-### FastAPI service for IMDB sentiment classifier.
+# AWS ML Model Deployment
+### Setting up AWS
+Create an AWS account [Free tier].
 
-##### Overview -
-This project involves building a RESTful API service using FastAPI to serve a IMDB sentiment classifier model. The service receives text input, processes it through the model, and returns the predicted sentiment and the probability. The project covers the following aspects:
-- FastAPI Framework: Utilises FastAPI to create an API.
-- ML Model: Uses a pre-trained sentiment analysis model.
-- Deployment: Containerised the application using Docker and deploys it on Google Cloud Platform
+#### User Group Creation
+Once the account setup is over, go to "IAM" and Create a user group with following permission policies enabled or checked
+- AmazonS3FullAccess
+- AmazonSageMakerFullAccess
 
-##### Prerequisites - 
-###### Language -
-- Python 3.9.13
-###### Packages -
+#### Adding User to the User Group
+Next go to "Users" and create a user and add this user to the above created User Group
+Once created, select that user and create an access key for "Command Line Interface".
+Once the access key is created notedown the 
+- ACCESS KEY
+- SECRET ACCESS KEY
+
+#### Role Creation
+Next go to roles and create a role with following policies, which we will later use it in creating an endpoint
+- AmazonSageMakerFullAccess
+- AmazonS3FullAccess 
+And note the ARN of this new role.
+
+
+### Setting up AWS CLI and Libraries for Local Machine
+
+#### Installing AWS CLI on Local Machine
+Next move on to your local machine and download the Amazon CLI
+1. Download the cli package from amazon `curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"`
+2. Extract the downloaded package `unzip -u awscliv2.zip`
+3. Go inside the extracted folder and install it sudo ./install
+4. Check the installation with the followingaws-cli/2.15.30 Python/3.11.6 Linux/5.10.205-195.807.amzn2.x86_64 botocore/2.4.5 command `aws --version`
+You'll get an output something like `aws-cli/2.15.30 Python/3.11.6 Linux/5.10.205-195.807.amzn2.x86_64 botocore/2.4.5`
+
+Next you need to configure the AWS CLI with the KEY and SECRET you created.
+```
+$ aws configure
+AWS Access Key ID [None]: your_access_key_id
+AWS Secret Access Key [None]: your_secret_access_key
+Default region name [None]: us-west-2
+Default output format [None]: json
+```
+
+#### Installing AWS python packages
+Next download the python packages required to access AWS 
+- boto3
+- sagemaker
+
+
+### Endpoint Creation
+
+#### Creating zipped model
+For creating an endpoint I'll be using a huggingface model 
+`https://huggingface.co/finiteautomata/beto-sentiment-analysis/tree/main`
+
+Download the model and the model dependency files
+`git clone https://huggingface.co/finiteautomata/beto-sentiment-analysis`
+
+Next create a tar file to push it to S3 bucket
+```
+cd beto-sentiment-analysis
+tar zcvf model.tar.gz *
+```
+
+#### Pushing zipped model to S3
+Create a S3 bucket to push the file too
+```
+aws s3api create-bucket \
+    --bucket sentiment-classification-fastapi \
+    --region ap-south-1 \
+    --create-bucket-configuration LocationConstraint=ap-south-1
+```
+Any region outside of `us-east-1` requires `LocationConstraint` to be specified in order to create the bucket in desired location.
+
+Push the .tar.gz file to S3 bucket
+`aws s3 cp model.tar.gz s3://sentiment-classification-fastapi/`
+
+
+### Deploying endpoint from Local Machine
+Follow the following steps to create an endpoint
+```
+from sagemaker.huggingface.model import HuggingFaceModel
+
+role = "arn:aws:iam::011528263565:role/dev" # Past the ARN of the role created
+endpoint_name = "fastapi-sentiment-classifier" # Name the endpoint
+
+# create Hugging Face Model Class
+huggingface_model = HuggingFaceModel(
+   model_data="s3://sentiment-classification-fastapi/model.tar.gz",  # path to your trained SageMaker model
+   role=role,                                            # IAM role with permissions to create an endpoint
+   transformers_version="4.26",                           # Mention the Transformers version used
+   pytorch_version="1.13",                                # PyTorch version used
+   py_version='py39',                                    # And Python version used
+)
+
+# deploy model to SageMaker Inference
+predictor = huggingface_model.deploy(
+   initial_instance_count=1,
+   instance_type="ml.m5.xlarge",
+   endpoint_name= endpoint_name
+)
+
+# Print the endpoint name
+print(f'Model deployed at endpoint: {predictor.endpoint_name}')
+```
+
+Once endpoint is successfully created you can test it out using the following code
+```
+import boto3
+
+endpoint_name = "fastapi-sentiment-classifier" 
+boto_session = boto3.Session(region_name='ap-south-1')
+sagemaker_runtime = boto_session.client('sagemaker-runtime')
+
+input_data = {
+   "inputs": "Camera - You are awarded a SiPix Digital Camera! call 09061221066 fromm landline. Delivery within 28 days."
+}
+
+payload = json.dumps(input_data)
+
+# Make the prediction
+response = sagemaker_runtime.invoke_endpoint(
+    EndpointName=endpoint_name,
+    Body=payload,
+    ContentType='application/json'  # Set the content type to JSON
+)
+
+result = response['Body'].read().decode('utf-8')
+print("Prediction result:", result)
+```
+
+
+### Wrapping the endpoint with FastAPI
+
+First install the requirements 
+- uvicorn
 - fastapi
-- Uvicorn
 - pydantic
-- tensorflow - If running on CPU
-- tensorflow[and-cuda] - If GPU is enabled
 
-All the libraries will be present in the requirements.txt file in the project folder.
+and execute the main.py code with the following command
+`uvicorn main:app --reload`
 
-##### Setting Up the Environment -
-Create a virtual environment
-- `Python3 -m venv onelab`
-- `Source onelab/bin/activate #To use the environment`
+#### Testing the API
+Test the API using the following address `http://0.0.0.0:8000/docs`
 
-Install required Packages
-- `pip install -r requirements.txt`
-
-To Deactivate the Environment
-- `deactivate`
-
-##### Project Structure
-The project directory contains the following files:
-```
-├──mini-project/
-|   ├──Dockerfile
-|   ├──main.py
-|   ├──requirements.txt
-|   ├──sentiment-model.h5
-```
-
-##### FastAPI Application
-The FastAPI application (‘main.py’) serves the IMDB sentiment classifier model.
-
-##### Dockerization:
-Create a file called Dockerfile and include the following commands
-
-```
-FROM python:3.9.13
-
-WORKDIR /app
-
-COPY requirements.txt /app/requirements.txt
-RUN pip install -no-cache-dir -r requirements.txt
-
-COPY . /app
-
-EXPOSE 8000
-
-CMD [“uvicorn”, “main:app”, “--host”, “0.0.0.0”, “--port”, “8000”]
-```
-
-##### Building the Docker Image:
-First check if docker is installed or not with “sudo docker ps” Command.
-If it is not installed use the following command to install it
-`sudo apt-get install -y docker.io`
-
-Next run the following docker commands
-- `sudo systemctl start docker` # Start the docker
-
-- `sudo usermod -aG docker $USER` # Adding our user to the group
-
-- `newgrp docker` # Logout and login to the system or use this command reset the user group
-
-- `sudo docker build -t fastapi-sentiment .`  # build the docker with the name “fastapi-sentiment”
-
-- `sudo docker run -d -p 8000:8000 fastapi-sentiment`  # run the docker with the following command
-
-
-##### Testing the API
-Test the API locally using the Fast API documentation
-`http://localhost:8000/docs`
-
-Request Format
-Using ‘curl’
-```
+or request using CURL
 curl -X 'POST' \
   'http://localhost:8000/predict' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
-  "text": "The first episode is interesting and you get the feeling that this might be quite good! People get stuck in a village for mysterious reasons and get slaughtered by creepy monsters."
+  "text": "Camera - You are awarded a SiPix Digital Camera! call 09061221066 fromm landline. Delivery within 28 days."
   }'
-```
-Response Format
-`{"Sentiment":"positive", "Probability":0.99}`
-
-
-Once this is done we can move on to the deployment of docker in GCP 
-1. Create a GCP VM Instance:
-
-2. After the machine is spun up, add the local machine machine SSH key “id_ed25519.pub” to a file called ".ssh/authorized_keys" in the VM.
-
-3. Transfer the project files to VM
-`scp -r mini-project username@externalIP:~/.`
-
-4. Once the files are copied, follow the same steps mentioned in “Building the Docker Image”
-
-5. Once the docker is built and running, we need to port forward port 8000.
-In the networking interface tab of the created Virtual Machine add a new firewall rule to port forward.
-![alt text](image.png)
-
-
-Now using the VM’s external IP address we can access the API
-`http://<external-ip>:8000/docs`
-
-Or 
-
-```
-curl -X 'POST' \
-  'http://<external-ip>:8000/predict' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "text": "The first episode is interesting and you get the feeling that this might be quite good! People get stuck in a village for mysterious reasons and get slaughtered by creepy monsters."
-  }'
-  ```
