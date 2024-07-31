@@ -1,0 +1,10 @@
+2024-07-31 15:55:07,884 - api_logger - INFO - Request: POST http://127.0.0.1:8000/predict/
+2024-07-31 15:55:08,705 - api_logger - INFO - Response: 200 (processed in 0.82 seconds)
+2024-07-31 15:55:52,493 - api_logger - INFO - Request: POST http://127.0.0.1:8000/predict/
+2024-07-31 15:55:52,638 - api_logger - INFO - Response: 200 (processed in 0.14 seconds)
+2024-07-31 15:55:53,553 - api_logger - INFO - Request: POST http://127.0.0.1:8000/predict/
+2024-07-31 15:55:53,764 - api_logger - INFO - Response: 200 (processed in 0.21 seconds)
+2024-07-31 15:55:54,242 - api_logger - INFO - Request: POST http://127.0.0.1:8000/predict/
+2024-07-31 15:55:54,378 - api_logger - INFO - Response: 200 (processed in 0.14 seconds)
+2024-07-31 15:55:54,778 - api_logger - INFO - Request: POST http://127.0.0.1:8000/predict/
+2024-07-31 15:55:54,992 - api_logger - INFO - Response: 200 (processed in 0.21 seconds)
